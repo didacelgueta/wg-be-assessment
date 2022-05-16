@@ -1,10 +1,21 @@
 import psycopg2
-from fastapi import APIRouter, Query, HTTPException
+import asyncio
+from databases import Database
+from fastapi import APIRouter, Query, HTTPException, Depends
 from fastapi.requests import Request
 
+from wg_be_exam.config import Config
 from wg_be_exam.routes.zipcode.models import ZipcodeResponse
 from wg_be_exam.actions.readCsv import ReadCsv
 
+# Dependency
+async def get_db():
+    db = Database(Config().DB_DSN.get_secret_value())
+    await db.connect()
+    try:
+        yield db
+    finally:
+        await db.disconnect()
 
 def get_zipcode_router():
     router = APIRouter()
@@ -50,10 +61,22 @@ def get_zipcode_router():
     The route should return the risk factor for a given zipcode.
     """
 
-    @router.get("/databases/zipcodes/{zipcode}")
-    async def get_zipcode_risk_factor_from_database(request: Request, zipcode: int):
-        # Add your solution here
-        pass
+    @router.get("/databases/zipcodes/{zipcode}", response_model=ZipcodeResponse)
+    async def get_zipcode_risk_factor_from_database(request: Request, zipcode: int, db: Database = Depends(get_db)) -> ZipcodeResponse:
+        query = "SELECT * FROM zipcodes WHERE zipcode = :zipcode"
+        select_zipcode_task = asyncio.create_task(db.fetch_one(query=query, values={"zipcode": zipcode}))  # nopep8
+        requested_zipcode = await select_zipcode_task
+
+        if requested_zipcode is not None and requested_zipcode[1] == zipcode:
+            return ZipcodeResponse(
+                zipcode=zipcode,
+                risk_factor=requested_zipcode[2],
+                exists=True
+            )
+
+        return ZipcodeResponse(
+            zipcode=zipcode
+        )
 
     """
     # 3.2
