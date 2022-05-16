@@ -1,0 +1,5 @@
+MASTER]
+#ignore=migrations,storage,tests
+
+[MESSAGES CONTROL]
+disable = line-too-long,invalid-name,redefined-outer-name
