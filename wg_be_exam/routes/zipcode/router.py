@@ -88,18 +88,27 @@ def get_zipcode_router():
     # 3.2.2 How could you easily improve the performance of this route on database level?
 
     """
+    """
+    Steps to imporove function:
+        1. Use async function
+        2. Set a response_model
+        3. Add db dependency injector as parameter
+        4. Use database package to do async query
+        5. Retrun must be the one set in response_model
+    """
+    @router.get("/databases/zipcodes", response_model=dict)
+    async def get_zipcode_by_risk_factor(request: Request, risk_factor: str = Query(None), db: Database = Depends(get_db)) -> dict:
+        query = "SELECT zipcode FROM zipcodes WHERE risk_factor = :risk_factor"
+        select_zipcode_task = asyncio.create_task(db.fetch_all(query=query, values={"risk_factor": risk_factor}))  # nopep8
+        requested_zipcodes = await select_zipcode_task
 
-    @router.get("/databases/zipcodes")
-    def get_zipcode_by_risk_factor(request: Request, risk_factor: str = Query(None)):
-        # This connection is used only for illustration purposes. Do not use it anywhere else!
-        connection = psycopg2.connect(request.app.config.DB_DSN.get_secret_value())
-        connection.set_session(autocommit=True)
+        if requested_zipcodes is None:
+            return {}
+
         zipcodes = []
-        with connection.cursor() as cursor:
-            cursor.execute(" SELECT zipcode, risk_factor FROM zipcodes WHERE risk_factor = '%s'" % risk_factor)
-            results = cursor.fetchall()
-            for r in results:
-                zipcodes.append(r[0])
-        return zipcodes
+        for zipcode in requested_zipcodes:
+            zipcodes.append(zipcode[0])
+
+        return {risk_factor: zipcodes}
 
     return router
