@@ -14,6 +14,7 @@ psycopg2-binary = "^2.9.1"
 databases = "^0.5.2"
 asyncpg = "^0.24.0"
 beautifulsoup4 = "^4.11.1"
+pandas = "^1.4.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^4.6"
