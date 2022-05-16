@@ -4,6 +4,9 @@ from abc import ABC, abstractmethod
 from databases import Database
 from pydantic import SecretStr
 
+from wg_be_exam.config import Config
+from wg_be_exam.db.seeders import ZipcodeSeeder
+
 
 class AbstractDB(ABC):
     @abstractmethod
@@ -24,11 +27,15 @@ class DB(AbstractDB):
     def connection(self):
         return self.db
 
-    async def setup(self) -> None:
+    async def setup(self, config: Config) -> None:
         try:
             self.db = Database(self.dsn.get_secret_value())
             await self.db.connect()
-            await self.db.execute("SELECT now();")  # Test connection
+            if config.RUN_SEEDER == True:
+                # {'zipcode': 1234, 'risk_factor': 'A'}
+                await ZipcodeSeeder(self.db).insert()
+                logging.debug(f"DB@setup Zipcode seeder executed")
+
             self.connected = True
         except Exception as e:
             logging.error(f"Failed to connect to database, got {e}")
