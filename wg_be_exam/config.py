@@ -13,5 +13,6 @@ except Exception:  # nosec
 class Config(BaseSettings):
     DB_DSN: SecretStr
     ENVIRONMENT: str
-    RUN_SEEDER = False
+    RUN_SEEDER: bool
     URL_HEALT_INDEXES = 'https://bestat.statbel.fgov.be/bestat/api/views/48744f07-252a-4a42-bca3-a2d7cb31c2fd/result/JSON'
+    REDIS_URL: str

@@ -2,8 +2,9 @@ import pandas as pd
 import os
 
 
-class ReadCsv:
-    def handle(self, filename: str) -> pd.DataFrame:
+class ReadZipcodesFile:
+    @staticmethod
+    def handle(filename: str) -> pd.DataFrame:
         csv_file = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
             '../',

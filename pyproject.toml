@@ -15,6 +15,7 @@ databases = "^0.5.2"
 asyncpg = "^0.24.0"
 pandas = "^1.4.2"
 alembic = "^1.7.7"
+fastapi-redis-cache = "^0.2.5"
 
 [tool.poetry.dev-dependencies]
 pytest = "^4.6"

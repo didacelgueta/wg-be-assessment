@@ -3,10 +3,11 @@ import asyncio
 from databases import Database
 from fastapi import APIRouter, Query, HTTPException, Depends
 from fastapi.requests import Request
+from fastapi_redis_cache import cache_one_day
 
 from wg_be_exam.config import Config
 from wg_be_exam.routes.zipcode.models import ZipcodeResponse
-from wg_be_exam.actions.readCsv import ReadCsv
+from wg_be_exam.actions.readZipcodesFile import ReadZipcodesFile
 
 # Dependency
 async def get_db():
@@ -36,24 +37,23 @@ def get_zipcode_router():
     """
 
     @router.get("/zipcodes/{zipcode}", response_model=ZipcodeResponse)
+    @cache_one_day()
     async def get_zipcode_risk_factor(request: Request, zipcode: int) -> ZipcodeResponse:
-        # Add your solution here
-
         if zipcode < 1000 or zipcode > 9999:
             raise HTTPException(status_code=404, detail=f'Zipcode {str(zipcode)} is not valid')  # nopep8
 
-        df_zipcodes = ReadCsv().handle('zipcodes.csv')
+        df_zipcodes = ReadZipcodesFile.handle('zipcodes.csv')
 
         if zipcode in df_zipcodes.index.to_list():
             return ZipcodeResponse(
                 zipcode=zipcode,
                 risk_factor=df_zipcodes[df_zipcodes.index == zipcode]['risk_factor'].values[0],  # nopep8
                 exists=True
-            )
+            ).dict()
 
         return ZipcodeResponse(
             zipcode=zipcode
-        )
+        ).dict()
 
     """
     # 3.1
@@ -62,6 +62,7 @@ def get_zipcode_router():
     """
 
     @router.get("/databases/zipcodes/{zipcode}", response_model=ZipcodeResponse)
+    @cache_one_day()
     async def get_zipcode_risk_factor_from_database(request: Request, zipcode: int, db: Database = Depends(get_db)) -> ZipcodeResponse:
         query = "SELECT * FROM zipcodes WHERE zipcode = :zipcode"
         select_zipcode_task = asyncio.create_task(db.fetch_one(query=query, values={"zipcode": zipcode}))  # nopep8
@@ -72,11 +73,11 @@ def get_zipcode_router():
                 zipcode=zipcode,
                 risk_factor=requested_zipcode[2],
                 exists=True
-            )
+            ).dict()
 
         return ZipcodeResponse(
             zipcode=zipcode
-        )
+        ).dict()
 
     """
     # 3.2
@@ -97,6 +98,7 @@ def get_zipcode_router():
         5. Retrun must be the one set in response_model
     """
     @router.get("/databases/zipcodes", response_model=dict)
+    @cache_one_day()
     async def get_zipcode_by_risk_factor(request: Request, risk_factor: str = Query(None), db: Database = Depends(get_db)) -> dict:
         query = "SELECT zipcode FROM zipcodes WHERE risk_factor = :risk_factor"
         select_zipcode_task = asyncio.create_task(db.fetch_all(query=query, values={"risk_factor": risk_factor}))  # nopep8

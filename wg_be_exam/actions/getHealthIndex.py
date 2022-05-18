@@ -10,4 +10,4 @@ class GetHealthIndex:
 
         for value in range(len(json_res)-1, 0, -1):
             if str(base_year) in json_res[value]['Base year']:
-                return json_res[value]['Health index']
+                return round(json_res[value]['Health index'], 2)
