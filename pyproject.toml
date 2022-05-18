@@ -13,14 +13,13 @@ SQLAlchemy = "^1.4.25"
 psycopg2-binary = "^2.9.1"
 databases = "^0.5.2"
 asyncpg = "^0.24.0"
-beautifulsoup4 = "^4.11.1"
 pandas = "^1.4.2"
 alembic = "^1.7.7"
 
 [tool.poetry.dev-dependencies]
 pytest = "^4.6"
-requests = "^2.26.0"
 pre-commit = "^2.15.0"
+requests = "^2.27.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
