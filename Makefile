@@ -17,3 +17,9 @@ dev: run
 
 test:
 	poetry run pytest
+
+coverage:
+	coverage run -m pytest
+
+coverage-report:
+	coverage report -m
