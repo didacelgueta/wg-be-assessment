@@ -31,7 +31,7 @@ class DB(AbstractDB):
         try:
             self.db = Database(self.dsn.get_secret_value())
             await self.db.connect()
-            if config.RUN_SEEDER == True:
+            if config.RUN_SEEDER:
                 # {'zipcode': 1234, 'risk_factor': 'A'}
                 await ZipcodeSeeder(self.db).insert()
                 logging.debug(f"DB@setup Zipcode seeder executed")

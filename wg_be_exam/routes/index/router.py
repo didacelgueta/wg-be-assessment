@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.requests import Request
+from fastapi_redis_cache import cache_one_day
 
 from wg_be_exam.actions.getHealthIndex import GetHealthIndex
 from wg_be_exam.config import Config
@@ -25,6 +26,7 @@ def get_index_router():
     router = APIRouter()
 
     @router.get("/index", response_model=IndexResponse)
+    @cache_one_day()
     async def get_health_index(request: Request, year: int = 2004) -> IndexResponse:
         if year not in [1996, 2004, 2013]:
             raise HTTPException(
@@ -32,6 +34,6 @@ def get_index_router():
 
         index = GetHealthIndex.handle(Config().URL_HEALT_INDEXES, year)
 
-        return IndexResponse(base_year=year, index=index)
+        return IndexResponse(base_year=year, index=index).dict()
 
     return router

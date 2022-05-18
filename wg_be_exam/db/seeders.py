@@ -3,7 +3,7 @@ from typing import Optional
 from databases import Database
 import asyncio
 
-from wg_be_exam.actions.readCsv import ReadCsv
+from wg_be_exam.actions.readZipcodesFile import ReadZipcodesFile
 from wg_be_exam.actions.insertValue import InsertValue
 
 
@@ -23,7 +23,7 @@ class ZipcodeSeeder(AbstractSeeder):
 
             return None
 
-        df_zipcodes = ReadCsv().handle('zipcodes.csv')
+        df_zipcodes = ReadZipcodesFile.handle('zipcodes.csv')
 
         for zipcode, risk_factor in df_zipcodes.iterrows():
             await InsertValue.handle(zipcode, risk_factor.values[0], self.db)
