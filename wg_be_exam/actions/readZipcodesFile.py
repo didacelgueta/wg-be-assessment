@@ -13,7 +13,7 @@ class ReadZipcodesFile:
 
         zipcodes = []
         for index, row in df.iterrows():
-            if len(index) > 4:
+            if len(str(index)) > 4:
                 a_min = int(str(index).split('-')[0].strip())
                 a_max = int(str(index).split('-')[1].strip())
                 for zipcode in range(a_min, a_max+1):
