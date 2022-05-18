@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.requests import Request
 
-from wg_be_exam.actions.getHealthIndexes import GetHealthIndexes
+from wg_be_exam.actions.getHealthIndex import GetHealthIndex
 from wg_be_exam.config import Config
 from wg_be_exam.routes.index.models import IndexResponse
 
@@ -26,18 +26,12 @@ def get_index_router():
 
     @router.get("/index", response_model=IndexResponse)
     async def get_health_index(request: Request, year: int = 2004) -> IndexResponse:
-        # Add your solution here
         if year not in [1996, 2004, 2013]:
             raise HTTPException(
                 status_code=404, detail=f'Year {year} is not valid')
 
-        indexes = GetHealthIndexes.handle(Config().URL_HEALT_INDEXES)
+        index = GetHealthIndex.handle(Config().URL_HEALT_INDEXES, year)
 
-        if year == 1996:
-            return IndexResponse(base_year=year, index=indexes[-6])
-        elif year == 2004:
-            return IndexResponse(base_year=year, index=indexes[-4])
-        elif year == 2013:
-            return IndexResponse(base_year=year, index=indexes[-2])
+        return IndexResponse(base_year=year, index=index)
 
     return router
