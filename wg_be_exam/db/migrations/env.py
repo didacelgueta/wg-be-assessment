@@ -5,8 +5,6 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from wg_be_exam.config import Config
-
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -26,7 +24,6 @@ target_metadata = None
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-config.set_main_option('sqlalchemy.url', Config().DB_DSN.get_secret_value())
 
 
 def run_migrations_offline():
