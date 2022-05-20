@@ -1,3 +1,34 @@
+## Solution
+
+#### Exercices
+Run the files to check the exercices solutions. The output should be nothing as there are assertions with the final results
+```
+python3 exercises/exercise_1_1.py
+python3 exercises/exercise_1_2.py
+```
+
+#### Application
+All the necessary commands are set in the Makefile file
+- Build docker with API, Postgres, Redis
+```
+make build
+```
+Once the containers are built you can browse the different endpoints in http://0.0.0.0:5000
+Example: Check zipcodes with 'A' risk factor in http://0.0.0.0:5000/databases/zipcodes?risk_factor=A
+
+By default when docker is built it will run the seeder. As postgres database has persistance, the next time you build docker you can change the RUN_SEEDER variable to False in enviroment file [.env](.env)
+
+- Run tests
+```
+make test
+```
+
+- Run coverage report
+```
+make coverage-report
+```
+
+
 # WeGroup Python Examination
 
 This project will test your general Python backend development skills.
